@@ -49,6 +49,7 @@ public class MainActivity extends AppCompatActivity {
         updateWeather();
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         MenuInflater inflater = getMenuInflater();

@@ -23,7 +23,7 @@ import java.util.Arrays;
 import java.util.List;
 
 /*
-* Fro my teacher from UdaCity:
+* For my teacher from UdaCity:
 * Hello, Thanks for your time!
 * I come from Chinese, So some Services Witch are from google That I can not enjoin.
 * So, I done some a little chance from our app.
@@ -37,26 +37,10 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        try {
-            this.weatherDataBunding();
-        } catch (JSONException e) {
-            e.printStackTrace();
-        }
-        ListView listView = (ListView) findViewById(
-                R.id.listview_forecast);
-        listView.setAdapter(this.mForecastAdapter);
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String forecast = mForecastAdapter.getItem(position);
-                Intent intent = new Intent(getApplication(), DetailActivity.class).
-                        putExtra(Intent.EXTRA_TEXT, forecast);
-                startActivity(intent);
-            }
-        });
-        ActionBar actionBar = getSupportActionBar();
-        actionBar.setDisplayShowHomeEnabled(true);
-        actionBar.setIcon(R.drawable.ic_launcher);
+        try{weatherDataBunding();}
+        catch(JSONException e){e.printStackTrace();}
+        updateListView();
+        updateActionBar();
     }
 
     @Override
@@ -77,34 +61,81 @@ public class MainActivity extends AppCompatActivity {
         int id = item.getItemId();
         if(id == R.id.action_refresh){
             updateWeather();
-            return true;
         }
         if(id == R.id.action_settings){
-            Intent intent = new Intent(getApplication(), SettingsActivity.class)
-                    .putExtra(Intent.EXTRA_REFERRER_NAME, getApplicationInfo());
-            startActivity(intent);
+            intent2Setting();
         }
         if(id == R.id.action_location){
-            SharedPreferences sharedPrefs =
-                    PreferenceManager.getDefaultSharedPreferences(this);
-            String location = sharedPrefs.getString(
-                    getString(R.string.pref_key_location),
-                    getString(R.string.pref_default_location)
-            );
-            Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
-                    .appendQueryParameter("q",location)
-                    .build();
-
-            Intent intent = new Intent(Intent.ACTION_VIEW);
-            intent.setData(geoLocation);
-            if(intent.resolveActivity(getPackageManager()) != null){
-                startActivity(intent);
-            }
+            share2Other();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    public void weatherDataBunding() throws JSONException {
+    /**
+     *Setting ListView
+     */
+    private void updateListView()
+    {
+        ListView listView = (ListView) findViewById(
+                R.id.listview_forecast);
+        if(listView != null) {
+            listView.setAdapter(this.mForecastAdapter);
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    String forecast = mForecastAdapter.getItem(position);
+                    Intent intent = new Intent(getApplication(), DetailActivity.class).
+                            putExtra(Intent.EXTRA_TEXT, forecast);
+                    startActivity(intent);
+                }
+            });
+        }
+    }
+
+    /**
+     *Setting ActionBar
+     */
+    private void updateActionBar(){
+        ActionBar actionBar = getSupportActionBar();
+        if(actionBar != null){
+            actionBar.setDisplayShowHomeEnabled(true);
+            actionBar.setIcon(R.drawable.ic_launcher);
+        }
+    }
+
+
+    /**
+     * go settings activity!
+     */
+    private void intent2Setting(){
+        Intent intent = new Intent(getApplication(), SettingsActivity.class)
+                .putExtra(Intent.EXTRA_REFERRER_NAME, getApplicationInfo());
+        startActivity(intent);
+    }
+
+    /**
+     *Share to Other(sms wechat facebook ...)
+     */
+    private void share2Other(){
+        SharedPreferences sharedPrefs = PreferenceManager.getDefaultSharedPreferences(this);
+
+        String location = sharedPrefs.getString(
+                getString(R.string.pref_key_location),
+                getString(R.string.pref_default_location));
+
+        Uri geoLocation = Uri.parse("geo:0,0?").buildUpon()
+                .appendQueryParameter("q",location).build();
+
+        Intent intent = new Intent(Intent.ACTION_VIEW);
+
+        intent.setData(geoLocation);
+        if(intent.resolveActivity(getPackageManager()) != null){
+            startActivity(intent);
+        }
+    }
+
+
+    private void weatherDataBunding() throws JSONException {
         String[] forecastArray = {};
         List<String> weekForecast = new ArrayList<String>(
                 Arrays.asList(forecastArray));
@@ -115,6 +146,7 @@ public class MainActivity extends AppCompatActivity {
                 weekForecast
         );
     }
+
 
     private void updateWeather(){
         APIWebService aws = new APIWebService();

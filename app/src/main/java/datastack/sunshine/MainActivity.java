@@ -140,7 +140,7 @@ public class MainActivity extends AppCompatActivity {
         String[] forecastArray = {};
         List<String> weekForecast = new ArrayList<String>(
                 Arrays.asList(forecastArray));
-        this.mForecastAdapter = new ArrayAdapter<String>(
+        mForecastAdapter = new ArrayAdapter<String>(
                 this,
                 R.layout.list_item_forecast,
                 R.id.list_item_forecast_textview,
